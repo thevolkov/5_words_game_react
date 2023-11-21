@@ -1,10 +1,8 @@
-import './App.css'
-
 function App() {
 
   return (
     <>
-
+      Здесь будет игра
     </>
   )
 }
