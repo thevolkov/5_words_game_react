@@ -14,7 +14,7 @@ const App: React.FC = () => {
   const randomWord = useMemo(() => {
     if (!wordsData.length) return
 
-    return wordsData[Math.floor(Math.random() * wordsData.length - 1)].toUpperCase()
+    return wordsData[Math.floor(Math.random() * wordsData.length - 1)]
   }, [])
 
   const screenKeyPressHandler = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -30,6 +30,9 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (word.length === 5 && event.key !== 'Backspace') return
+      if (!word.length && event.key === 'Backspace') return
+
       setLetter(event.key.toUpperCase())
 
       if (word.length && event.key === 'Backspace') setWord(word => word.slice(0, -1))
@@ -44,14 +47,17 @@ const App: React.FC = () => {
         setWord('')
       }
 
-      if (word.length >= 5 || event.key.match(/[^а-яА-Я]+/g)) return
+      if (word.length === 5 || event.key.match(/[^а-яА-Я]+/g)) return
       else setWord(word => word + event.key)
     }
 
     document.addEventListener('keydown', handleKeyDown)
 
+    const clearLetter = setTimeout(() => setLetter(''), 300)
+
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
+      clearTimeout(clearLetter)
     }
   }, [attempts, word, word.length])
 
@@ -75,7 +81,7 @@ const App: React.FC = () => {
                 id={keyboardKey}
                 onClick={screenKeyPressHandler}
                 className={
-                  keyboardKey.toUpperCase() === letter && word.length < 5
+                  keyboardKey.toUpperCase() === letter && word.length <= 5
                     ? 'letter keyboard-pressed'
                     : 'letter'
                 }

@@ -130,17 +130,16 @@ button:focus-visible {
 }
 
 .keyboard .letter:active {
-  background: #f5bb3e;
   color: #000;
   scale: .95;
 }
 
 .keyboard-pressed {
-  background: #f5bb3e;
+  background: #f5d03e;
   color: #000;
   scale: .95;
 }
 
-.letter:hover, .letter:active {
+.letter:hover, .letter:active, .keyboard-pressed {
   transition: background .5s, color .5s, scale .25s;
 }
