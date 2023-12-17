@@ -30,6 +30,7 @@ body {
   justify-content: center;
   min-width: 320px;
   min-height: 100vh;
+  user-select: none;
 }
 
 h1 {
@@ -73,6 +74,17 @@ button:focus-visible {
   }
 }
 
+.game-board {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  height: 100vh;
+}
+
+.keyboard:hover {
+}
+
 .attempts {
   display: flex;
   flex-direction: column;
@@ -85,8 +97,9 @@ button:focus-visible {
 }
 
 .letter {
-  width: 50px;
-  height: 50px;
+  width: auto;
+  min-width: 40px;
+  height: 40px;
   font-size: 25px;
   font-weight: 500;
   border: 1px solid white;
@@ -95,4 +108,39 @@ button:focus-visible {
   display: flex;
   align-items: center;
   text-transform: uppercase;
+  padding: 5px;
+}
+
+.keyboard {
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  width: 67.5vw;
+  gap: 10px;
+}
+
+.keyboard .letter {
+  cursor: pointer;
+}
+
+.keyboard .letter:hover {
+  background: #f5d03e;
+  color: #000;
+}
+
+.keyboard .letter:active {
+  background: #f5bb3e;
+  color: #000;
+  scale: .95;
+}
+
+.keyboard-pressed {
+  background: #f5bb3e;
+  color: #000;
+  scale: .95;
+}
+
+.letter:hover, .letter:active {
+  transition: background .5s, color .5s, scale .25s;
 }
