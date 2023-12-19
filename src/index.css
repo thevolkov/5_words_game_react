@@ -97,27 +97,32 @@ button:focus-visible {
 }
 
 .letter {
-  width: auto;
-  min-width: 40px;
-  height: 40px;
-  font-size: 25px;
+  min-width: 35px;
+  width: 3vw;
+  min-height: 35px;
+  height: 3vw;
+  font-size: 20px;
   font-weight: 500;
   border: 1px solid white;
-  border-radius: 10px;
+  border-radius: .75vw;
   justify-content: center;
   display: flex;
   align-items: center;
   text-transform: uppercase;
-  padding: 5px;
 }
 
 .keyboard {
   margin-bottom: 30px;
   display: flex;
-  justify-content: center;
   flex-wrap: wrap;
-  width: 67.5vw;
   gap: 10px;
+}
+
+.keys-row {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  justify-content: center;
 }
 
 .keyboard .letter {
@@ -127,11 +132,25 @@ button:focus-visible {
 .keyboard .letter:hover {
   background: #f5d03e;
   color: #000;
+  border-color: #ffffff;
+  scale: 1.1;
 }
 
 .keyboard .letter:active {
   color: #000;
   scale: .95;
+}
+
+.keyboard .letter:focus {
+  outline: none;
+}
+
+.keyboard .letter:disabled {
+  background: inherit;
+  color: #656565;
+  border-color: #656565;
+  cursor: not-allowed;
+  scale: 1;
 }
 
 .keyboard-pressed {
@@ -140,6 +159,21 @@ button:focus-visible {
   scale: .95;
 }
 
-.letter:hover, .letter:active, .keyboard-pressed {
+.letter:hover, .letter:active {
   transition: background .5s, color .5s, scale .25s;
+}
+
+.correct-letter {
+  background: #f5d03e;
+  color: #000;
+}
+
+.wrong-position-letter {
+  background: #ffffff;
+  color: #000;
+}
+
+.wrong-letter {
+  background: #8c8c8c;
+  color: #ffffff;
 }
