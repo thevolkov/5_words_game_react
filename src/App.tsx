@@ -9,32 +9,15 @@ const KEYS_ARRAY = [
 
 const App: React.FC = () => {
   const [randomWord, setRandomWord] = useState<string>('')
-  const [letter, setLetter] = useState<string>('')
   const [attemptWord, setAttemptWord] = useState<string>('')
   const [attempts, setAttempts] = useState(new Array(6).fill(null))
-  const [gameOver, setGameOver] = useState(false)
+  const [gameOver, setGameOver] = useState<boolean>(false)
+  const [showDictionary, setShowDictionary] = useState<boolean>(false)
+  // const [letter, setLetter] = useState<string>('')
 
   const indexOfNull = attempts.indexOf(null)
-
-  const screenKeyHandler = (event: React.MouseEvent) => {
-    const clickedKey = event.currentTarget.id
-
-    if (attemptWord.length && clickedKey === 'Backspace') setAttemptWord(word => word.slice(0, -1))
-
-    if (attemptWord.length < 5 || clickedKey === 'Backspace') {
-      setAttemptWord(word => clickedKey === 'Backspace'
-        ? word.slice(0, -1)
-        : word + clickedKey
-      )
-    }
-
-    if (attemptWord.length === 5 && clickedKey === 'Enter') {
-      const updatedAttempts = [...attempts]
-      updatedAttempts[indexOfNull] = attemptWord.toUpperCase()
-      setAttempts(updatedAttempts)
-      setAttemptWord('')
-    }
-  }
+  const enterKey = 'Enter'
+  const bsKey = 'Backspace'
 
   const randomWordForGame = (): void => {
     if (!wordsData.length) return
@@ -43,14 +26,14 @@ const App: React.FC = () => {
   }
 
   const changeKeySymbol = (key: string): string => {
-    if (key === 'Backspace') return '⌫'
-    else if (key === 'Enter') return '✓'
+    if (key === bsKey) return '⌫'
+    else if (key === enterKey) return '✓'
     else return key
   }
 
   const disableKey = (key: string): boolean => {
-    if (key === 'Enter' && attemptWord.length < 5) return true
-    else return key === 'Backspace' && !attemptWord.length
+    if (key === enterKey && attemptWord.length < 5) return true
+    else return key === bsKey && !attemptWord.length
   }
 
   const winOrLoseText = (): string => {
@@ -68,48 +51,71 @@ const App: React.FC = () => {
     randomWordForGame()
   }, [])
 
+  const screenKeyHandler = (event: React.MouseEvent): void => {
+    const clickedKey = event.currentTarget.id
+
+    if (attemptWord.length < 5 || clickedKey === bsKey) {
+      setAttemptWord(word =>
+        clickedKey === bsKey
+          ? word.slice(0, -1)
+          : word + clickedKey
+      )
+    }
+
+    if (attemptWord.length === 5 && clickedKey === enterKey) updateAttempts()
+  }
+
+// Обработчик нажатий на клавиатуре компьютера
+//   const keyDownHandler = (event: KeyboardEvent): void => {
+//     const keysCheck = event.key !== bsKey && event.key !== enterKey
+//
+//     const shouldSkip =
+//       attemptWord.length < 5 && event.key === enterKey ||
+//       event.key.match(/[^а-яА-Я]+/g) && keysCheck ||
+//       attemptWord.length === 5 && keysCheck ||
+//       !attemptWord.length && event.key === bsKey
+//
+//     if (shouldSkip) return
+//
+//     if (attemptWord.length === 5 && event.key === enterKey) {
+//       updateAttempts()
+//       return
+//     }
+//
+//     setAttemptWord(word =>
+//       event.key === bsKey ? word.slice(0, -1) : word + event.key.toUpperCase()
+//     )
+//     setLetter(event.key)
+//   }
+
+  const updateAttempts = (): void => {
+    if (indexOfNull !== -1) {
+      attempts[indexOfNull] = attemptWord.toUpperCase()
+      setAttempts([...attempts])
+      setAttemptWord('')
+    }
+  }
+
   useEffect(() => {
-    const keyDownHandler = (event: KeyboardEvent) => {
-      if (attemptWord.length === 5 && event.key !== 'Backspace' && event.key !== 'Enter') return
-      if (!attemptWord.length && event.key === 'Backspace') return
+    const isGameOver =
+      attempts.length === 6 &&
+      attempts.every(attempt => attempt !== null) ||
+      attempts.some(attempt => attempt === randomWord)
 
-      setLetter(event.key)
+    if (isGameOver) setGameOver(true)
 
-      if (attemptWord.length && event.key === 'Backspace') setAttemptWord(word => word.slice(0, -1))
+    // document.addEventListener('keydown', keyDownHandler)
+    // const clearLetter = setTimeout(() => setLetter(''), 300)
 
-      if (attemptWord.length === 5 && event.key === 'Enter') {
-        const updatedAttempts = [...attempts]
-        updatedAttempts[indexOfNull] = attemptWord.toUpperCase()
-        setAttempts(updatedAttempts)
-        setAttemptWord('')
-      }
-
-      if (attemptWord.length === 5 || event.key.match(/[^а-яА-Я]+/g)) return
-      else setAttemptWord(word => word + event.key.toUpperCase())
-    }
-
-    document.addEventListener('keydown', keyDownHandler)
-
-    const clearLetter = setTimeout(() => setLetter(''), 300)
-
-    if (attempts.length === 6 && attempts.every(attempt => attempt !== null) || attempts.some(attempt => attempt === randomWord)) {
-      setGameOver(true)
-    }
-
-    return () => {
-      document.removeEventListener('keydown', keyDownHandler)
-      clearTimeout(clearLetter)
-    }
-  }, [attempts, indexOfNull, randomWord, attemptWord])
+    // return () => {
+    //   document.removeEventListener('keydown', keyDownHandler)
+    //   clearTimeout(clearLetter)
+    // }
+  }, [attempts, randomWord])
 
   return (
     <>
       <div className="game-board">
-        <div
-          style={{
-            marginTop: '30px',
-            fontSize: '35px'
-          }}>{randomWord}</div>
         <WordsGrid
           attempts={attempts}
           randomWord={randomWord}
@@ -128,11 +134,7 @@ const App: React.FC = () => {
                     <button
                       id={key}
                       onClick={screenKeyHandler}
-                      className={
-                        key.toLowerCase() === letter && attemptWord.length <= 5
-                          ? 'letter keyboard-pressed'
-                          : 'letter'
-                      }
+                      className="letter"
                       disabled={disableKey(key)}
                       key={key}
                     >
@@ -149,14 +151,46 @@ const App: React.FC = () => {
         gameOver && (
           <div className="game-over">
             <div>{winOrLoseText()}</div>
+            <div className="random-word">
+              <span>Правильное слово:</span>
+              {randomWord.split('').map((letter, index) => (
+                <div
+                  className="letter correct-letter"
+                  key={letter + index}
+                >
+                  {letter}
+                </div>
+              ))}
+            </div>
             <button
               onClick={restartGameHandler}
-              className="correct-letter">
+              className="play-again-button">
               СЫГРАТЬ ЕЩЕ РАЗ
             </button>
           </div>
         )
       }
+      {
+          <div
+            className={`dictionary ${!showDictionary && 'dictionary-closed'}`}
+          >
+            {
+              wordsData.map(word => (
+                <p key={word}>{word}</p>
+              ))
+            }
+          </div>
+      }
+      <div
+        onClick={() => setShowDictionary(!showDictionary)}
+        className={`dictionary-toggle ${!showDictionary && 'dictionary-toggle-closed'}`}
+      >
+        {
+          showDictionary
+            ? "❌"
+            : "📗"
+        }
+      </div>
     </>
   )
 }
